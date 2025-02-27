@@ -18,8 +18,8 @@ export class CustomDom extends AbstractToolbar {
         }
 
         this.addEventListener("click", (e) => {
-            if (this.camera && this.config && this.config.onClick) {
-                this.config.onClick(e, this.camera);
+            if (this.panoramic.camera && this.config && this.config.onClick) {
+                this.config.onClick(e, this.panoramic.camera);
             }
         });
     }
