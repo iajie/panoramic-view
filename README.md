@@ -1,8 +1,10 @@
+
 <h1 align="center"><a href="https://www.easy-flowable.online/component" target="_blank">panoramic-view</a></h1>
 <h4 align="center"><a href='https://gitee.com/iajie/panoramic-view/stargazers'><img src='https://gitee.com/iajie/panoramic-view/badge/star.svg?theme=gvp' alt='star' /></a></h4>
-#### 介绍
+
 <h2 align="center">简易 开源全景图片查看器</h2>
 <h3 align="center">开箱即用、支持所有前端框架</h4>
+
 ## 开始关注并使用 panoramic-view
 
 给我们 star，这样，在我们发布新的版本时，您可以及时获得通知。
