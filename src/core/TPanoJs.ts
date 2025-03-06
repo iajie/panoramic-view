@@ -68,11 +68,6 @@ export interface TPanoJsOptions {
      */
     fileList: FileList[];
     /**
-     * @description 主题
-     * @default light
-     */
-    theme?: 'dark' | 'light';
-    /**
      * @description 语言
      * @default zh
      */
@@ -108,7 +103,6 @@ export interface TPanoJsOptions {
 
 const defaultOptions: Partial<TPanoJsOptions> = {
     lang: 'zh',
-    theme: 'light',
     mouseController: true,
     deviceOrientationControls: false,
     rotateAnimateController: false,
@@ -172,8 +166,6 @@ export class TPanoJs {
         // 根据传递container属性获取父级传递的数据是否为id，如果是则转为dom
         const rootEl = typeof this.options.container === "string" ?
             document.querySelector(this.options.container) as Element : this.options.container;
-        // 主题-白/黑
-        rootEl.classList.add(`t-pano-theme-${this.options.theme}`);
         // 获取父级dom class
         this.container = rootEl.querySelector(".t-pano-container")!;
         // 如果没有就创建
@@ -588,17 +580,4 @@ export class TPanoJs {
         return this;
     }
 
-    changeTheme(theme?: "dark" | "light") {
-        const rootEl = typeof this.options.container === "string" ?
-                document.querySelector(this.options.container) as Element : this.options.container;
-        if (!theme) {
-            theme = this.options.theme === "dark" ? "light" : "dark";
-        }
-        this.destroy();
-        rootEl.classList.remove(`t-pano-theme-${this.options.theme}`);
-        rootEl.classList.add(`t-pano-theme-${theme}`);
-        this.options.theme = theme;
-        this.initialize();
-        return this;
-    }
 }

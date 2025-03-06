@@ -11,14 +11,16 @@ import { ZoomIn } from "./toolbar/ZoomIn.ts";
 import { ZoomOut } from "./toolbar/ZoomOut.ts";
 import { Reset } from "./toolbar/Reset.ts";
 import { Switch } from "./toolbar/Function.ts";
+import { AutoView } from "./toolbar/AutoView.ts";
 
-const defaultToolbarKeys = ["show-list", "import", "zoom-in", "zoom-out", "reset", "switch"];
+const defaultToolbarKeys = ["show-list", "import", "zoom-in", "zoom-out", "reset", "auto-view", "switch"];
 
 defineCustomElement("t-pano-toolbar-show-list", ShowList);
 defineCustomElement("t-pano-toolbar-import", Import);
 defineCustomElement("t-pano-toolbar-zoom-in", ZoomIn);
 defineCustomElement("t-pano-toolbar-zoom-out", ZoomOut);
 defineCustomElement("t-pano-toolbar-reset", Reset);
+defineCustomElement("t-pano-toolbar-auto-view", AutoView);
 defineCustomElement("t-pano-toolbar-switch", Switch);
 
 export class Toolbar extends HTMLElement {
@@ -67,6 +69,7 @@ export class Toolbar extends HTMLElement {
                         content: tip,
                         theme: "t-pano-tip",
                         arrow: true,
+                        placement: "left"
                     });
                     this.toolbar.push(button);
                 } else {
@@ -86,8 +89,9 @@ export class Toolbar extends HTMLElement {
                         tip && tippy(button, {
                             appendTo: document.querySelector('.t-pano-container')!,
                             content: tip,
-                            theme: 'easy-bpmn-designer-tip',
+                            theme: 't-pano-tip',
                             arrow: true,
+                            placement: "left"
                         });
                     }
                     this.toolbar.push(button);
