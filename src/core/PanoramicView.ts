@@ -4,10 +4,14 @@ import { en } from "../i18n/en.ts";
 import i18next, { Resource, t } from "i18next";
 import '../styles/index.css';
 import '../styles/toolbar.css';
+import '../styles/loading.css';
 import { Toolbar } from "../components/Toolbar.ts";
-import { defineCustomElement } from "../utils/DomUtils.ts";
+import { defineCustomElement, hide } from "../utils/DomUtils.ts";
+import { Loading } from "../components/Loading.ts";
+import { JelleAnimator } from "../utils/Animation.ts";
 
 defineCustomElement('t-pano-toolbar', Toolbar);
+defineCustomElement('t-pano-loading', Loading);
 
 export interface FileList {
     name: string;
@@ -48,7 +52,7 @@ interface SwitchTexture {
     status: 'end' | 'loading';
 }
 
-export interface TPanoJsOptions {
+export interface PanoramicViewOptions {
     container: Element | string;
     /**
      * @description 体感控制开关，true表示打开，false表示关闭
@@ -62,7 +66,7 @@ export interface TPanoJsOptions {
     /**
      * @description 镜头自动旋转
      */
-    rotateAnimateController: boolean;
+    rotateAnimateController?: boolean;
     /**
      * 文件列表
      */
@@ -85,6 +89,10 @@ export interface TPanoJsOptions {
      */
     toolbarExcludeKeys?: string[];
     /**
+     * 加载效果-全局的
+     */
+    loading?: boolean;
+    /**
      * 加载中事件
      */
     onLoad?: (e: LoadTexture) => void;
@@ -92,7 +100,7 @@ export interface TPanoJsOptions {
      * dom构建完成
      * @param opts
      */
-    onCreated?: (opts: TPanoJs) => void;
+    onCreated?: (opts: PanoramicView) => void;
     /**
      * 图片切换事件
      */
@@ -101,17 +109,18 @@ export interface TPanoJsOptions {
     debug?: boolean;
 }
 
-const defaultOptions: Partial<TPanoJsOptions> = {
+const defaultOptions: Partial<PanoramicViewOptions> = {
     lang: 'zh',
     mouseController: true,
     deviceOrientationControls: false,
-    rotateAnimateController: false,
+    rotateAnimateController: true,
     debug: false,
+    loading: false,
 };
 
-export class TPanoJs {
+export class PanoramicView {
 
-    options: TPanoJsOptions;
+    options: PanoramicViewOptions;
     /**
      * t-pano全景dom
      */
@@ -120,15 +129,22 @@ export class TPanoJs {
     texture: THREE.Texture[] = [];
     loadTextureMsg!: LoadTexture;
     scene!: THREE.Scene;
+    mesh!: THREE.Mesh;
     camera!: THREE.PerspectiveCamera;
     renderer!: THREE.WebGLRenderer;
+    /**
+     * @description 镜头角度
+     */
+    anglexoz: number = -90;
+    rotateAnimateTimer: number | null = null;
     /**
      * @description 手机端多点触控 用来开闭鼠标控制支持的，如果用户在进行放大手势，应该将鼠标视角控制锁定
      */
     mouseFovControllerSport = true;
 
     toolbar!: Toolbar;
-    constructor(options: TPanoJsOptions) {
+    loading!: Loading;
+    constructor(options: PanoramicViewOptions) {
         this.options = { ...defaultOptions, ...options };
         this.initialize();
     }
@@ -194,8 +210,9 @@ export class TPanoJs {
         //生成全景图片3D对象
         const geometry = new THREE.SphereGeometry(500, 60, 40);
         geometry.scale(-1, 1, 1);
-        let mesh = new THREE.Mesh(geometry);
-        this.scene.add(mesh);
+        this.mesh = new THREE.Mesh(geometry);
+        this.scene.add(this.mesh);
+
         this.loadTextureLoader(this.loadTextureLoaderIndex);
 
         // 体感控制
@@ -204,45 +221,87 @@ export class TPanoJs {
         this.mouseController();
         // 启动多点触控
         this.phoneController();
-
+        // 相机位置移动
+        this.wardKeydown();
         // 动画绑定
         this.animate();
 
-        // 镜头自动旋转 60帧
-        setTimeout(() => this.rotateAnimate, 1000 / 60);
+        // 自转动画
+        this.autoAnimate();
 
+        // 点击后停止自转
         this.container.addEventListener('pointerdown', ()=> {
             if (this.options.mouseController) {
                 this.options.rotateAnimateController = false;
+                this.autoAnimate();
             }
         });
 
         // 工具栏
         this.toolbar = new Toolbar();
-        this.toolbar.onCreate(this.options, this.camera);
+        this.toolbar.onCreate(this);
         rootEl.appendChild(this.toolbar);
+
+        // 加载动画
+        this.loading = new Loading();
+        this.container.appendChild(this.loading);
+
+        /** 重设宽高 **/
+        // this.loadAnimate();
+        // this.resizeRendererToDisplaySize(window.innerWidth, window.innerHeight);
         // 初始化方法
         this.options.onCreated?.(this);
     }
 
-    rotateAnimate() {
-        // 相机在xoz平面上的角度
-        let anglexoz = -90;
+    /**
+     * 关闭旋转动画
+     */
+    closeRateAnimate() {
+        this.options.rotateAnimateController = false;
+        if (this.rotateAnimateTimer) {
+            clearInterval(this.rotateAnimateTimer);
+            this.rotateAnimateTimer = null;
+        }
+    }
+
+    /**
+     * 自转动画
+     */
+    autoAnimate() {
+        // 镜头自动旋转 60帧
+        if (!this.rotateAnimateTimer) {
+            this.rotateAnimateTimer = setInterval(() => this.rotateAnimate(), 1000 / 60);
+        } else {
+            clearInterval(this.rotateAnimateTimer);
+            this.rotateAnimateTimer = null;
+        }
+    }
+
+    private closeLoadAnimate() {
+        JelleAnimator.create(".t-pano-loading-bar-x").stop();
+        JelleAnimator.create(".t-pano-loading-bar-x").animate({
+            width: "100%"
+        }, 1000);
+        setTimeout(() => hide(this.loading), 1500);
+    }
+
+    private rotateAnimate() {
         // 镜头自由旋转
         const rotateAnimateController = this.options.rotateAnimateController;
         if (rotateAnimateController && !this.options.deviceOrientationControls) {
-            anglexoz += 0.1;
-            if (anglexoz > 360) {
-                anglexoz = 0;
+            this.anglexoz += 0.1;
+            if (this.anglexoz > 360) {
+                this.anglexoz = 0;
             }
-            let x = Math.cos(anglexoz * Math.PI / 180) * 500;
-            let z = Math.sin(anglexoz * Math.PI / 180) * 500;
+            let x = Math.cos(this.anglexoz * Math.PI / 180) * 500;
+            let z = Math.sin(this.anglexoz * Math.PI / 180) * 500;
             this.camera.lookAt(x, 0, z);
         }
     }
 
-    animate() {
-        requestAnimationFrame(this.animate);
+    private animate() {
+        // 这个动画很重要，涉及到鼠标长按后滑动的镜头
+        requestAnimationFrame(() => this.animate());
         //热点摆动
         for (let i = 0; i < this.scene.children.length; i++) {
             if (this.scene.children[i].name == 'hotspot') {
@@ -303,6 +362,26 @@ export class TPanoJs {
         }, false);
     }
 
+    wardKeydown() {
+        document.addEventListener("keydown", (event)=> {
+            console.log("按键", event.code);
+            switch (event.code) {
+                case "ArrowUp":
+                    this.camera.position.z += 5 * Math.PI; // 相机向上移动
+                    break;
+                case "ArrowDown":
+                    this.camera.position.z -= 5 * Math.PI; // 相机向下移动
+                    break;
+                case "ArrowLeft":
+                    this.camera.position.x -= 5 * Math.PI; // 相机向左移动
+                    break;
+                case "ArrowRight":
+                    this.camera.position.x += 5 * Math.PI; // 相机向右移动
+                    break;
+            }
+        });
+    }
+
     mouseController() {
         //初始化鼠标控制用变量
         let isUserInteracting = false, onPointerDownMouseX = 0, onPointerDownMouseY = 0,
@@ -312,7 +391,7 @@ export class TPanoJs {
         //鼠标控制视角、响应热点交互
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
-        const onMouseMove = (event: MouseEvent)=> {
+        const onMouseMove = (event: MouseEvent) => {
             if (!this.options.mouseController) {
                 return;
             }
@@ -324,7 +403,7 @@ export class TPanoJs {
 
         //鼠标按下到松开期间有没有移动，如果没有移动说明点击的是热点，否则是移动视角
         let clientX: number, clientY: number;
-        this.container.addEventListener('pointerdown', (event)=> {
+        this.container.addEventListener('pointerdown', (event) => {
             if (!this.options.mouseController) {
                 return;
             }
@@ -350,22 +429,28 @@ export class TPanoJs {
             // 计算物体和射线的交点
             const intersects = raycaster.intersectObjects(this.scene.children);
             for (let i = 0; i < intersects.length; i++) {
-                if (this.options.debug) {
+                if (this.options.debug == true) {
                     console.log('点击坐标：', intersects[i].point);
                 }
-                /*//检测点击热点是否跳转场地
-                if (intersects[i].object.jumpTo != null && i == 0) {
-                    switchPhotoN(intersects[i].object.jumpTo);
-                    console.log(scene);
-                }*/
+                //检测点击热点是否跳转场地
+                // if (intersects[i].object.jumpTo != null && i == 0) {
+                //     switchPhotoN(intersects[i].object.jumpTo);
+                //     console.log(scene);
+                // }
             }
         }
+
+        this.container.style.touchAction = 'none';
+        this.container.addEventListener('pointerdown', (e) => onPointerDown(e));
+        this.container.addEventListener('wheel', (e) => onDocumentMouseWheel(e));
+        //计算摄像机目前视角状态，保持当前状态，在当前状态上附加变化
+        lon = -1 * THREE.MathUtils.radToDeg(this.camera.rotation.y) - 90;//经度
+        lat = THREE.MathUtils.radToDeg(this.camera.rotation.x);//纬度
 
         const onPointerDown = (event: PointerEvent)=> {
             if (!this.options.mouseController) {
                 return;
             }
-            //console.log(camera);
             onMouseMove(event);
             if (!event.isPrimary) return;
             isUserInteracting = true;
@@ -373,46 +458,21 @@ export class TPanoJs {
             onPointerDownMouseY = event.clientY;
             onPointerDownLon = lon;
             onPointerDownLat = lat;
-            document.addEventListener('pointermove', onPointerMove);
-            document.addEventListener('pointerup', onPointerUp);
+            this.container.addEventListener('pointermove', onPointerMove);
+            this.container.addEventListener('pointerup', onPointerUp);
         }
-
-        /**
-         * 用户滚动鼠标滚轮或类似的输入设备时触发的事件
-         * @param event 事件
-         */
-        const onDocumentMouseWheel = (event: WheelEvent)=> {
-            if (!this.options.mouseController) {
-                return;
-            }
-            const fov = this.camera.fov + event.deltaY * 0.05;
-            this.camera.fov = THREE.MathUtils.clamp(fov, 10, 75);
-            this.camera.updateProjectionMatrix();
-        }
-
-        this.container.style.touchAction = 'none';
-        this.container.addEventListener('pointerdown', onPointerDown);
-        // 监听鼠标滚轮事件
-        document.addEventListener('wheel', onDocumentMouseWheel);
-        //计算摄像机目前视角状态，保持当前状态，在当前状态上附加变化
-        lon = -1 * THREE.MathUtils.radToDeg(this.camera.rotation.y) - 90;//经度
-        lat = THREE.MathUtils.radToDeg(this.camera.rotation.x);//纬度
-
 
         const onPointerMove = (event: PointerEvent)=> {
             if (!this.options.mouseController) {
                 return;
             }
             if (!event.isPrimary) return;
-            //触控灵敏度 //想写个函数来线性计算这里的灵敏度，暂时没找到合适的函数
-            const rate = this.isPhone() ? 0.4 : 0.1;
+            let rate = this.isPhone() ? 0.4 : 0.1;//触控灵敏度
 
             //缩放视角时 暂停相机旋转
             if (this.mouseFovControllerSport) {
                 lon = (onPointerDownMouseX - event.clientX) * rate + onPointerDownLon;
-                //console.log('calc0:'+onPointerDownLat);
                 lat = (event.clientY - onPointerDownMouseY) * rate + onPointerDownLat;
-                //console.log('calc1:'+lat);
                 update();
             }
         }
@@ -423,11 +483,20 @@ export class TPanoJs {
             }
             if (!event.isPrimary) return;
             isUserInteracting = false;
-            document.removeEventListener('pointermove', onPointerMove);
-            document.removeEventListener('pointerup', onPointerUp);
+            this.container.removeEventListener('pointermove', onPointerMove);
+            this.container.removeEventListener('pointerup', onPointerUp);
         }
 
-        const update = ()=> {
+        const onDocumentMouseWheel = (event: WheelEvent)=> {
+            if (!this.options.mouseController) {
+                return;
+            }
+            const fov = this.camera.fov + event.deltaY * 0.05;
+            this.camera.fov = THREE.MathUtils.clamp(fov, 10, 75);
+            this.camera.updateProjectionMatrix();
+        }
+
+        const update = () => {
             if (!isUserInteracting) {
                 //lon += 0.1;
             }
@@ -469,7 +538,11 @@ export class TPanoJs {
                 this.loadTextureLoaderEnd();
             }, 2000);
         } else {
-            this.texture[index] = new THREE.TextureLoader().load(photo.url, () => this.loadTextureLoaderEnd);
+            this.texture[index] = new THREE.TextureLoader().load(photo.url, () => this.loadTextureLoaderEnd(), (e) => {
+                console.log("onProgress的回调", e);
+            }, (err) => {
+                console.log("加载错误回调", err);
+            });
         }
     }
 
@@ -484,6 +557,8 @@ export class TPanoJs {
             loading: { id: i + 1, name: photo.name },
             leftOver: fileLength - i - 1
         };
+        // 加载中动画
+        this.closeLoadAnimate();
         // 加载中事件传递
         this.options.onLoad?.(this.loadTextureMsg);
         if (i == 0) {
@@ -554,6 +629,7 @@ export class TPanoJs {
             this.camera.fov = fov;
             this.camera.updateProjectionMatrix();
         }
+        this.mesh.material = new THREE.MeshBasicMaterial({ map: this.texture[index] });
         return {
             status: 'OK',
             msg: '切换成功'
@@ -572,7 +648,22 @@ export class TPanoJs {
         this.container.remove();
     }
 
-    changeLocal(lang: TPanoJsOptions['lang']) {
+    /**
+     * 宽高重设
+     * @param width 宽度
+     * @param height 高度
+     */
+    resizeRendererToDisplaySize(width: number, height: number) {
+        this.camera.aspect = width / height;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(width, height, false);
+        this.container.style.width = width + 'px';
+        this.container.style.height = height + 'px';
+        this.renderer.domElement.style.width = width + 'px';
+        this.renderer.domElement.style.height = height + 'px';
+    }
+
+    changeLocal(lang: PanoramicViewOptions['lang']) {
         this.destroy();
         this.options.lang = lang;
         i18next.changeLanguage(lang);

@@ -1,6 +1,5 @@
 import { AbstractToolbar } from "./toolbar/AbstractToolbar.ts";
-import { Custom, TPanoJsOptions } from "../core/TPanoJs.ts";
-import * as THREE from "three";
+import { Custom, PanoramicView } from "../core/PanoramicView.ts";
 import { t } from "i18next";
 import tippy from "tippy.js";
 import { CustomDom } from "./toolbar/CustomDom.ts";
@@ -12,8 +11,15 @@ import { ZoomOut } from "./toolbar/ZoomOut.ts";
 import { Reset } from "./toolbar/Reset.ts";
 import { Switch } from "./toolbar/Function.ts";
 import { AutoView } from "./toolbar/AutoView.ts";
+import { Upward } from "./toolbar/Upward.ts";
+import { Downward } from "./toolbar/Downward.ts";
+import { Leftward } from "./toolbar/Leftward.ts";
+import { Rightward } from "./toolbar/Rightward.ts";
 
-const defaultToolbarKeys = ["show-list", "import", "zoom-in", "zoom-out", "reset", "auto-view", "switch"];
+const defaultToolbarKeys = ["show-list", "import", "zoom-in", "zoom-out", "reset", "auto-view",
+    "up", "down", "left", "right",
+    "switch",
+];
 
 defineCustomElement("t-pano-toolbar-show-list", ShowList);
 defineCustomElement("t-pano-toolbar-import", Import);
@@ -22,6 +28,10 @@ defineCustomElement("t-pano-toolbar-zoom-out", ZoomOut);
 defineCustomElement("t-pano-toolbar-reset", Reset);
 defineCustomElement("t-pano-toolbar-auto-view", AutoView);
 defineCustomElement("t-pano-toolbar-switch", Switch);
+defineCustomElement("t-pano-toolbar-up", Upward);
+defineCustomElement("t-pano-toolbar-down", Downward);
+defineCustomElement("t-pano-toolbar-left", Leftward);
+defineCustomElement("t-pano-toolbar-right", Rightward);
 
 export class Toolbar extends HTMLElement {
 
@@ -40,18 +50,19 @@ export class Toolbar extends HTMLElement {
         }
     }
 
-    onCreate(options: TPanoJsOptions, camera: THREE.PerspectiveCamera) {
-        let toolbarKeys = options.toolbarKeys || defaultToolbarKeys;
+    onCreate(panoramic: PanoramicView) {
+        const { options } = panoramic;
+        let toolbarKeys = panoramic.options.toolbarKeys || defaultToolbarKeys;
         toolbarKeys = toolbarKeys.filter((tool) => {
             if (typeof tool === "string") {
                 return !options.toolbarExcludeKeys?.includes(tool);
             }
             return true;
         });
-        this.initToolbarKeys(options, camera, toolbarKeys);
+        this.initToolbarKeys(panoramic, toolbarKeys);
     }
 
-    initToolbarKeys(options: TPanoJsOptions, camera: THREE.PerspectiveCamera, toolbarKeys: (string | Custom)[]) {
+    initToolbarKeys(panoramic: PanoramicView, toolbarKeys: (string | Custom)[]) {
         for (let i = 0; i < toolbarKeys.length; i++) {
             let toolbarKey = toolbarKeys[i];
             if (!toolbarKey) continue;
@@ -61,7 +72,7 @@ export class Toolbar extends HTMLElement {
                     const button = document.createElement(`t-pano-toolbar-${toolbarKey}`) as AbstractToolbar;
                     button.style.display = toolbarKey === "switch" ? "block" : "none";
                     button.classList.add("t-pano-toolbar-item");
-                    button.onCreate(options, camera);
+                    button.onCreate(panoramic);
                     const tip = t(toolbarKey) as string;
                     button.setAttribute("data-title", tip);
                     tip && tippy(button, {
@@ -82,7 +93,7 @@ export class Toolbar extends HTMLElement {
                     if (custom.className) {
                         button.classList.add(custom.className);
                     }
-                    button.onCreate(options, camera);
+                    button.onCreate(panoramic);
                     button.onConfig(custom);
                     if (custom.tip) {
                         const tip = t(custom.tip) as string;

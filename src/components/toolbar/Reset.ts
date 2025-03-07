@@ -11,5 +11,8 @@ export class Reset extends AbstractToolbar {
     }
 
     onClick() {
+        this.panoramic.anglexoz = -90;
+        this.panoramic.camera.position.set(0, 0, 0);
+        this.panoramic.camera.lookAt(0, 0, 0);
     }
 }

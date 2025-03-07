@@ -1,5 +1,5 @@
 import { AbstractToolbar } from "./AbstractToolbar.ts";
-import { Custom } from "../../core/TPanoJs.ts";
+import { Custom } from "../../core/PanoramicView.ts";
 
 export class CustomDom extends AbstractToolbar {
 

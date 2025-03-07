@@ -1,1 +1,1 @@
-export { TPanoJs } from './core/TPanoJs.ts';
+export { TPanoJs } from './core/PanoramicView.ts';

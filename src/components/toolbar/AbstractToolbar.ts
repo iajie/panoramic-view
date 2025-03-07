@@ -1,11 +1,9 @@
-import { TPanoJsOptions } from "../../core/TPanoJs.ts";
-import * as THREE from "three";
+import { PanoramicView } from "../../core/PanoramicView.ts";
 
 export class AbstractToolbar extends HTMLElement {
 
     template = '';
-    options!: TPanoJsOptions;
-    camera!: THREE.PerspectiveCamera;
+    panoramic!: PanoramicView;
     constructor() {
         super();
     }
@@ -24,8 +22,7 @@ export class AbstractToolbar extends HTMLElement {
 
     }
 
-    onCreate(options: TPanoJsOptions, camera: THREE.PerspectiveCamera) {
-        this.options = options;
-        this.camera = camera;
+    onCreate(panoramic: PanoramicView) {
+        this.panoramic = panoramic;
     }
 }

@@ -1,4 +1,5 @@
 import { AbstractToolbar } from "./AbstractToolbar.ts";
+import * as THREE from "three";
 
 export class ZoomIn extends AbstractToolbar {
 
@@ -11,5 +12,9 @@ export class ZoomIn extends AbstractToolbar {
     }
 
     onClick() {
+        this.panoramic.closeRateAnimate();
+        const fov = this.panoramic.camera.fov - 1;
+        this.panoramic.camera.fov = THREE.MathUtils.clamp(fov, 10, 75);
+        this.panoramic.camera.updateProjectionMatrix();
     }
 }

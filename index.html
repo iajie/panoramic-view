@@ -6,30 +6,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>t-pano-js</title>
   <script>
-    let isDark = false;
-    function changeTheme() {
-      document.body.style.background = isDark ? "" : "#1a1b1e"
-      document.querySelector("#t-pano").style.color = isDark ? "" : "#eee"
-      tPano.changeTheme();
-      isDark = !isDark;
-    }
     function changeLanguage() {
-      const options = tPano.getOptions();
+      const options = pv.getOptions();
       if (options.lang == 'en') {
-        tPano.changeLocal("zh");
+        pv.changeLocal("zh");
       } else {
-        tPano.changeLocal("en");
+        pv.changeLocal("en");
       }
     }
   </script>
 </head>
 <body>
-<div style="padding: 10px 20px;font-size: 30px" id="title">
-  <a href="https://easy-flowable.online" target="_blank">访问官网</a>
-  <button onclick="changeTheme()">切换主题</button>
-  <button onclick="changeLanguage()">切换语言</button>
-</div>
-<div id="t-pano" style="width: 100%; height: 90vh;"></div>
+<div id="t-pano" style="width: 100%; height: 98vh"></div>
 <script type="module" src="/src/main.ts"></script>
 </body>
 </html>
