@@ -1,4 +1,5 @@
 import { AbstractToolbar } from "./AbstractToolbar.ts";
+import { hide } from "../../utils/DomUtils.ts";
 
 export class ShowList extends AbstractToolbar {
 
@@ -11,6 +12,10 @@ export class ShowList extends AbstractToolbar {
     }
 
     onClick() {
-        super.onClick();
+        if (this.panoramic.fileListBox.style.display === "none") {
+            this.panoramic.fileListBox.style.display = "flex";
+        } else {
+            hide(this.panoramic.fileListBox);
+        }
     }
 }

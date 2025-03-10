@@ -6,12 +6,14 @@ import '../styles/index.css';
 import '../styles/toolbar.css';
 import '../styles/loading.css';
 import { Toolbar } from "../components/Toolbar.ts";
-import { defineCustomElement, hide } from "../utils/DomUtils.ts";
+import { defineCustomElement, hide, show } from "../utils/DomUtils.ts";
 import { Loading } from "../components/Loading.ts";
 import { JelleAnimator } from "../utils/Animation.ts";
+import { FileListBox } from "../components/FileListBox.ts";
 
 defineCustomElement('t-pano-toolbar', Toolbar);
 defineCustomElement('t-pano-loading', Loading);
+defineCustomElement('t-pano-file-box', FileListBox);
 
 export interface FileList {
     name: string;
@@ -144,6 +146,7 @@ export class PanoramicView {
 
     toolbar!: Toolbar;
     loading!: Loading;
+    fileListBox!: FileListBox;
     constructor(options: PanoramicViewOptions) {
         this.options = { ...defaultOptions, ...options };
         this.initialize();
@@ -246,11 +249,19 @@ export class PanoramicView {
         this.loading = new Loading();
         this.container.appendChild(this.loading);
 
+        // 文件显示栏
+        this.initFileList();
+
         /** 重设宽高 **/
         // this.loadAnimate();
         // this.resizeRendererToDisplaySize(window.innerWidth, window.innerHeight);
         // 初始化方法
         this.options.onCreated?.(this);
+    }
+
+    private initFileList() {
+        this.fileListBox = new FileListBox(this);
+        this.container.appendChild(this.fileListBox);
     }
 
     /**
@@ -277,12 +288,17 @@ export class PanoramicView {
         }
     }
 
-    private closeLoadAnimate() {
+    private loadAnimate() {
+        show(this.loading);
         JelleAnimator.create(".t-pano-loading-bar-x").stop();
         JelleAnimator.create(".t-pano-loading-bar-x").animate({
             width: "100%"
         }, 1000);
         setTimeout(() => hide(this.loading), 1500);
+    }
+
+    private closeLoadAnimate() {
+        hide(this.loading);
     }
 
     private rotateAnimate() {
@@ -500,15 +516,12 @@ export class PanoramicView {
             if (!isUserInteracting) {
                 //lon += 0.1;
             }
-            //console.log('lon->' + lon, 'lat->' + lat);
             lat = Math.max(- 85, Math.min(85, lat));
             phi = THREE.MathUtils.degToRad(90 - lat);
             theta = THREE.MathUtils.degToRad(lon);
             const x = 500 * Math.sin(phi) * Math.cos(theta);
             const y = 500 * Math.cos(phi);
             const z = 500 * Math.sin(phi) * Math.sin(theta);
-            //console.log('x=' + x + 'y=' + y + 'z=' + z);
-            //console.log('x=' + THREE.MathUtils.radToDeg(camera.rotation.x), 'y=' + THREE.MathUtils.radToDeg(camera.rotation.y));
             this.camera.lookAt(x, y, z);
         }
     }
@@ -541,12 +554,14 @@ export class PanoramicView {
             this.texture[index] = new THREE.TextureLoader().load(photo.url, () => this.loadTextureLoaderEnd(), (e) => {
                 console.log("onProgress的回调", e);
             }, (err) => {
-                console.log("加载错误回调", err);
+                console.error("加载错误回调", err);
             });
         }
     }
 
     loadTextureLoaderEnd() {
+        // 加载中动画
+        this.loadAnimate();
         let i = this.loadTextureLoaderIndex;
         const photo = this.options.fileList[i];
         const fileLength = this.options.fileList.length;
@@ -557,8 +572,6 @@ export class PanoramicView {
             loading: { id: i + 1, name: photo.name },
             leftOver: fileLength - i - 1
         };
-        // 加载中动画
-        this.closeLoadAnimate();
         // 加载中事件传递
         this.options.onLoad?.(this.loadTextureMsg);
         if (i == 0) {
@@ -572,6 +585,7 @@ export class PanoramicView {
     }
 
     switchPhotoN(index: number) {
+        console.log("ss", index);
         let response = {
             status: 'ERROR',
             msg: '系统出错'
@@ -589,6 +603,7 @@ export class PanoramicView {
                     status: 'end'
                 });
                 response = this.switchGo(index);
+                this.closeLoadAnimate();
             } else {
                 //未加载完成，请等待一秒后再尝试
                 this.options.switchLoad?.({

@@ -5,6 +5,7 @@ window.pv = new PanoramicView({
   container: '#t-pano',
   fileList: [{
     name: "足球场",
-    url: "2.avi"
-  }]
+    url: "1.jpg"
+  }],
+  rotateAnimateController: false,
 });

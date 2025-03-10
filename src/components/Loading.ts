@@ -5,10 +5,10 @@ export class Loading extends HTMLElement {
     }
 
     connectedCallback() {
+        this.classList.add("t-pano-loading");
         if (this.children && this.children.length) {
             return;
         }
-        this.classList.add("t-pano-loading");
         const loadBarK = document.createElement("div");
         loadBarK.classList.add("t-pano-loading-bar-k");
         const loadBarX = document.createElement("div");
