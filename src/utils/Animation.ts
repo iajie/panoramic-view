@@ -101,6 +101,9 @@ export class JelleAnimator {
             if (typeof target === "string" && target.endsWith("%")) {
                 return [Number(target.substring(0, target.length - 1)), "%"]
             }
+            if (typeof target === "string" && target.endsWith("px")) {
+                return [Number(target.substring(0, target.length - 2)), "px"]
+            }
             return [Number(target), ''];
         }
 

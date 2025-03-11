@@ -380,7 +380,6 @@ export class PanoramicView {
 
     wardKeydown() {
         document.addEventListener("keydown", (event)=> {
-            console.log("按键", event.code);
             switch (event.code) {
                 case "ArrowUp":
                     this.camera.position.z += 5 * Math.PI; // 相机向上移动
@@ -504,6 +503,13 @@ export class PanoramicView {
         }
 
         const onDocumentMouseWheel = (event: WheelEvent)=> {
+            const target = event.target as HTMLElement;
+            // 如果是文件列表就不缩放了
+            for (let className of target.classList) {
+                if (className.startsWith("t-pano-file-list")) {
+                    return;
+                }
+            }
             if (!this.options.mouseController) {
                 return;
             }
@@ -544,7 +550,7 @@ export class PanoramicView {
                     <source src="${photo.url}">
                 </video>`);
             let videoDom = document.getElementById(id)! as HTMLVideoElement;
-            videoDom.play();
+            // videoDom.play();
             this.texture[index] = new THREE.VideoTexture(videoDom);
             //没有找到监听加载的办法，暂时使用延迟模拟回调
             setTimeout(() => {
@@ -585,7 +591,6 @@ export class PanoramicView {
     }
 
     switchPhotoN(index: number) {
-        console.log("ss", index);
         let response = {
             status: 'ERROR',
             msg: '系统出错'
@@ -643,6 +648,11 @@ export class PanoramicView {
             fov = this.isPhone() ? 90 : 60;
             this.camera.fov = fov;
             this.camera.updateProjectionMatrix();
+        }
+        // 切换时再播放视频
+        if (photo.type === "video") {
+            const videoDom = document.getElementById(`t-pano-video-${index}`)! as HTMLVideoElement;
+            videoDom.play();
         }
         this.mesh.material = new THREE.MeshBasicMaterial({ map: this.texture[index] });
         return {

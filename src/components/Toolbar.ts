@@ -5,7 +5,6 @@ import tippy from "tippy.js";
 import { CustomDom } from "./toolbar/CustomDom.ts";
 import { defineCustomElement } from "../utils/DomUtils.ts";
 import { ShowList } from "./toolbar/ShowList.ts";
-import { Import } from "./toolbar/Import.ts";
 import { ZoomIn } from "./toolbar/ZoomIn.ts";
 import { ZoomOut } from "./toolbar/ZoomOut.ts";
 import { Reset } from "./toolbar/Reset.ts";
@@ -16,13 +15,13 @@ import { Downward } from "./toolbar/Downward.ts";
 import { Leftward } from "./toolbar/Leftward.ts";
 import { Rightward } from "./toolbar/Rightward.ts";
 
-const defaultToolbarKeys = ["show-list", "import", "zoom-in", "zoom-out", "reset", "auto-view",
-    "up", "down", "left", "right",
+const defaultToolbarKeys = [
+    "zoom-in", "zoom-out", "reset", "auto-view",
+    "up", "down", "left", "right", "show-list",
     "switch",
 ];
 
 defineCustomElement("t-pano-toolbar-show-list", ShowList);
-defineCustomElement("t-pano-toolbar-import", Import);
 defineCustomElement("t-pano-toolbar-zoom-in", ZoomIn);
 defineCustomElement("t-pano-toolbar-zoom-out", ZoomOut);
 defineCustomElement("t-pano-toolbar-reset", Reset);

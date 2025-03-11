@@ -1,5 +1,6 @@
 import { AbstractToolbar } from "./AbstractToolbar.ts";
 import { hide } from "../../utils/DomUtils.ts";
+import { JelleAnimator } from "../../utils/Animation.ts";
 
 export class ShowList extends AbstractToolbar {
 
@@ -12,10 +13,18 @@ export class ShowList extends AbstractToolbar {
     }
 
     onClick() {
-        if (this.panoramic.fileListBox.style.display === "none") {
+        if (this.panoramic.fileListBox.style.display === "none" || window.getComputedStyle(this.panoramic.fileListBox).display === "none") {
             this.panoramic.fileListBox.style.display = "flex";
+            JelleAnimator.create(this.panoramic.fileListBox).animate({
+                opacity: 1,
+                height: this.panoramic.container.clientWidth < 1000 ? "120px" : "150px",
+            }, 500);
         } else {
-            hide(this.panoramic.fileListBox);
+            setTimeout(()=> JelleAnimator.create(this.panoramic.fileListBox).animate({
+                height: 0,
+                opacity: 0,
+            }, 500), 200);
+            setTimeout(() => hide(this.panoramic.fileListBox), 1000);
         }
     }
 }

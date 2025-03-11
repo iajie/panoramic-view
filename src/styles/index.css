@@ -119,27 +119,48 @@
 .t-pano-file-list {
     position: absolute;
     width: 100%;
-    padding: 8px 10px;
+    padding: 8px 0;
     left: 0;
     right: 0;
     bottom: 0;
-    height: 150px;
+    height: 0;
     background-color: rgba(20, 20, 20, 0.4);
     border-radius: 5px;
-    display: flex;
+    display: none;
     overflow-x: scroll;
     overflow-y: hidden;
+    /* dom不可选中 */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    &::-webkit-scrollbar {
+        width: 5px;
+        height: 6px;
+    }
+
+    /* 轨道颜色 */
+    &::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        background-color: #dddddd70;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        border-radius: 10px;
+        background-color: #404040;
+    }
+
+    &::-webkit-scrollbar-thumb:active {
+        border-radius: 10px;
+        background-color: #404040;
+    }
 
     .t-pano-file-list-box {
         margin: 0 16px;
         position: relative;
-
-        & img {
-            width: 180px;
-            height: 100px;
-            background-color: #ffffffcc;
-        }
     }
+
     .t-pano-file-list-box:nth-last-child(1) {
         padding-right: 18px;
     }
@@ -155,5 +176,26 @@
         text-align: center;
         width: 180px;
         color: #ffffff;
+    }
+
+    @media (max-width: 700px) {
+        .t-pano-file-list-box-img {
+            width: 120px;
+            height: 70px;
+            background-color: #ffffffcc;
+        }
+        .t-pano-file-list-box-img {
+            width: 120px;
+            height: 70px;
+            background-color: #ffffffcc;
+        }
+        .t-pano-file-list-box-p {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            text-align: center;
+            width: 120px;
+            color: #ffffff;
+        }
     }
 }
