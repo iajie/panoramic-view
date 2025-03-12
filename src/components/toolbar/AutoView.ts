@@ -11,7 +11,7 @@ export class AutoView extends AbstractToolbar {
     }
 
     onClick() {
-        this.panoramic.options.rotateAnimateController = !this.panoramic.options.rotateAnimateController;
+        this.panoramic.rotateAnimateController = !this.panoramic.rotateAnimateController;
         this.panoramic.autoAnimate();
     }
 }

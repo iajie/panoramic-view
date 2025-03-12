@@ -157,7 +157,7 @@ export class PanoramicView {
      * @description 手机端多点触控 用来开闭鼠标控制支持的，如果用户在进行放大手势，应该将鼠标视角控制锁定
      */
     mouseFovControllerSport = true;
-
+    rotateAnimateController?: boolean;
     hotspotAnimate = 0;
 
     toolbar!: Toolbar;
@@ -165,6 +165,7 @@ export class PanoramicView {
     fileListBox!: FileListBox;
     constructor(options: PanoramicViewOptions) {
         this.options = { ...defaultOptions, ...options };
+        this.rotateAnimateController = options.rotateAnimateController;
         this.initialize();
     }
 
@@ -209,6 +210,19 @@ export class PanoramicView {
             this.container.classList.add("t-pano-container");
         }
         rootEl.appendChild(this.container);
+
+        // 工具栏
+        this.toolbar = new Toolbar();
+        this.toolbar.onCreate(this);
+        rootEl.appendChild(this.toolbar);
+
+        // 加载动画
+        this.loading = new Loading();
+        this.container.appendChild(this.loading);
+
+        // 文件显示栏
+        this.initFileList();
+
         const width = this.container.clientWidth;
         const height = this.container.clientHeight;
         //初始化场景、相机、渲染器
@@ -256,18 +270,6 @@ export class PanoramicView {
             }
         });
 
-        // 工具栏
-        this.toolbar = new Toolbar();
-        this.toolbar.onCreate(this);
-        rootEl.appendChild(this.toolbar);
-
-        // 加载动画
-        this.loading = new Loading();
-        this.container.appendChild(this.loading);
-
-        // 文件显示栏
-        this.initFileList();
-
         /** 重设宽高 **/
         // this.loadAnimate();
         // this.resizeRendererToDisplaySize(window.innerWidth, window.innerHeight);
@@ -297,7 +299,9 @@ export class PanoramicView {
     autoAnimate() {
         // 镜头自动旋转 60帧
         if (!this.rotateAnimateTimer) {
-            this.rotateAnimateTimer = setInterval(() => this.rotateAnimate(), 1000 / 60);
+            if (this.rotateAnimateController) {
+                this.rotateAnimateTimer = setInterval(() => this.rotateAnimate(), 1000 / 60);
+            }
         } else {
             clearInterval(this.rotateAnimateTimer);
             this.rotateAnimateTimer = null;
@@ -310,16 +314,22 @@ export class PanoramicView {
         JelleAnimator.create(".t-pano-loading-bar-x").animate({
             width: "100%"
         }, 1000);
-        setTimeout(() => hide(this.loading), 1500);
     }
 
     private closeLoadAnimate() {
-        hide(this.loading);
+        setTimeout(() => {
+            JelleAnimator.create(".t-pano-loading-bar-x").animate({
+                width: "0%"
+            }, 0, () => {
+                hide(this.loading);
+            });
+        }, 1000);
+
     }
 
     private rotateAnimate() {
         // 镜头自由旋转
-        const rotateAnimateController = this.options.rotateAnimateController;
+        const rotateAnimateController = this.rotateAnimateController;
         if (rotateAnimateController && !this.options.deviceOrientationControls) {
             this.anglexoz += 0.1;
             if (this.anglexoz > 360) {
@@ -338,12 +348,12 @@ export class PanoramicView {
         for (let i = 0; i < this.scene.children.length; i++) {
             if (this.scene.children[i].name == 'hotspot') {
                 if (this.hotspotAnimate >= 300) {
-                    this.hotspotAnimate = 1;
+                    this.hotspotAnimate = 0;
                 }
-                if (this.hotspotAnimate <= 200) {
-                    this.scene.children[i].position.y = this.scene.children[i].position.y + 0.04;
+                if (this.hotspotAnimate <= 150) {
+                    this.scene.children[i].position.y = this.scene.children[i].position.y + 0.03;
                 } else {
-                    this.scene.children[i].position.y = this.scene.children[i].position.y - 0.04;
+                    this.scene.children[i].position.y = this.scene.children[i].position.y - 0.03;
                 }
                 this.hotspotAnimate++;
             }
@@ -582,8 +592,6 @@ export class PanoramicView {
     }
 
     loadTextureLoaderEnd() {
-        // 加载中动画
-        this.loadAnimate();
         let i = this.loadTextureLoaderIndex;
         const photo = this.options.fileList[i];
         const fileLength = this.options.fileList.length;
@@ -607,6 +615,8 @@ export class PanoramicView {
     }
 
     switchPhotoN(index: number) {
+        this.loadAnimate();
+        // 加载中动画
         let response = {
             status: 'ERROR',
             msg: '系统出错'
@@ -624,7 +634,6 @@ export class PanoramicView {
                     status: 'end'
                 });
                 response = this.switchGo(index);
-                this.closeLoadAnimate();
             } else {
                 //未加载完成，请等待一秒后再尝试
                 this.options.switchLoad?.({
@@ -639,6 +648,7 @@ export class PanoramicView {
         } else {
             response.msg = '无效的照片索引';
         }
+        this.closeLoadAnimate();
         return response;
     }
 
@@ -671,6 +681,7 @@ export class PanoramicView {
             videoDom.play();
         }
         this.mesh.material = new THREE.MeshBasicMaterial({ map: this.texture[index] });
+        this.closeLoadAnimate();
         // 切换了景点，设置热点,先将之前的热点消除
         this.clearHotspot();
         // 设置热点
