@@ -17,6 +17,8 @@ defineCustomElement('t-pano-file-box', FileListBox);
 
 export interface FileList {
     name: string;
+    /** 关键字，可以是漫游点为ID */
+    key?: string;
     url: string;
     type?: 'image' | 'video';
     /**
@@ -25,7 +27,19 @@ export interface FileList {
     fov?: {
         pc: number;
         phone: number;
-    }
+    };
+    /** 全景热点，video不生效，如果没有跳转点，那么就将相机移动到该点位，否则跳转漫游 */
+    hotspot?: {
+        position: {
+            x: number;
+            y: number;
+            z: number;
+        };
+        /** 点位图标url */
+        icon: string;
+        /** 跳转漫游点 可以是file的key也可以是name */
+        jumpTo?: string;
+    }[]
 }
 
 export interface Custom {
@@ -143,6 +157,8 @@ export class PanoramicView {
      * @description 手机端多点触控 用来开闭鼠标控制支持的，如果用户在进行放大手势，应该将鼠标视角控制锁定
      */
     mouseFovControllerSport = true;
+
+    hotspotAnimate = 0;
 
     toolbar!: Toolbar;
     loading!: Loading;
@@ -318,21 +334,18 @@ export class PanoramicView {
     private animate() {
         // 这个动画很重要，涉及到鼠标长按后滑动的镜头
         requestAnimationFrame(() => this.animate());
-        //热点摆动
+        //热点上下摆动-让用户看到这个点
         for (let i = 0; i < this.scene.children.length; i++) {
             if (this.scene.children[i].name == 'hotspot') {
-                // if (hotspotAnimate_count >= 400) {
-                //     hotspotAnimate_count = 1;
-                //     scene.children[i].position.y = hotspotAnimate_temp[i];
-                // }
-                //
-                // if (hotspotAnimate_count <= 200) {
-                //     scene.children[i].position.y = scene.children[i].position.y + 0.04;
-                // } else {
-                //     scene.children[i].position.y = scene.children[i].position.y - 0.04;
-                // }
-                //
-                // hotspotAnimate_count++;
+                if (this.hotspotAnimate >= 300) {
+                    this.hotspotAnimate = 1;
+                }
+                if (this.hotspotAnimate <= 200) {
+                    this.scene.children[i].position.y = this.scene.children[i].position.y + 0.04;
+                } else {
+                    this.scene.children[i].position.y = this.scene.children[i].position.y - 0.04;
+                }
+                this.hotspotAnimate++;
             }
         }
         this.render();
@@ -447,11 +460,14 @@ export class PanoramicView {
                 if (this.options.debug == true) {
                     console.log('点击坐标：', intersects[i].point);
                 }
-                //检测点击热点是否跳转场地
-                // if (intersects[i].object.jumpTo != null && i == 0) {
-                //     switchPhotoN(intersects[i].object.jumpTo);
-                //     console.log(scene);
-                // }
+                console.log(intersects[i])
+                const jumpTo = intersects[i].object.userData.jumpTo;
+                //检测点击热点是否存在跳转热点
+                if (jumpTo && i == 0) {
+                    // 寻找跳转的点位
+                    const index = this.options.fileList.findIndex(file => (file.key || file.name) === jumpTo);
+                    this.switchPhotoN(index);
+                }
             }
         }
 
@@ -655,10 +671,56 @@ export class PanoramicView {
             videoDom.play();
         }
         this.mesh.material = new THREE.MeshBasicMaterial({ map: this.texture[index] });
+        // 切换了景点，设置热点,先将之前的热点消除
+        this.clearHotspot();
+        // 设置热点
+        this.hotspotSettings(photo.hotspot)
         return {
             status: 'OK',
             msg: '切换成功'
         }
+    }
+
+    private handleIcon(icon: string) {
+        if (icon.startsWith("<svg") && icon.endsWith("</svg>")) {
+            const svgBlob = new Blob([icon], { type: "image/svg+xml;charset=utf-8" });
+            return URL.createObjectURL(svgBlob);
+        }
+        return icon;
+    }
+
+    hotspotSettings(hotspots: FileList['hotspot']) {
+        if (hotspots && hotspots.length) {
+            for (let hotspot of hotspots) {
+                // 加纹理->图片
+                const map = new THREE.TextureLoader().load(this.handleIcon(hotspot.icon));
+                // 材质-标记点把图标作为点位
+                const spriteMaterial = new THREE.SpriteMaterial({ map });
+                const sprite = new THREE.Sprite(spriteMaterial);
+                // 设置点位位置
+                const { x, y, z } = hotspot.position;
+                sprite.position.set(x * 0.9, y * 0.9, z);
+                sprite.scale.set(30, 30, 1);
+                sprite.name = "hotspot";
+                if (hotspot.jumpTo) {
+                    // 自定义信息-跳转热点
+                    sprite.userData.jumpTo = hotspot.jumpTo;
+                }
+                this.scene.add(sprite);
+            }
+        }
+    }
+
+    clearHotspot() {
+        const children = this.scene.children;
+        for (let i = 0; i < children.length; i++) {
+            if (children[i].name === "hotspot") {
+                this.scene.children.splice(i, 1);
+                //从一个数组中去掉一个元素会使得后面的元素下标前移1，所以下一个遍历的元素下标也需要减一，避免漏网之鱼
+                i--;
+            }
+        }
+
     }
 
     isPhone() {
