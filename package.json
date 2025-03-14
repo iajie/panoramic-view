@@ -1,8 +1,16 @@
 {
   "name": "panoramic-view",
-  "description": "基于TPno构建的全景图查看器。",
-  "private": true,
-  "version": "0.0.0",
+  "description": "基于ThreeJS构建的全景图查看器。",
+  "version": "0.0.1",
+  "author": {
+    "email": "ajie20999@163.com",
+    "name": "MoJie",
+    "url": "https://gitee.com/iajie"
+  },
+  "repository": {
+    "url": "https://gitee.com/iajie/panoramic-view"
+  },
+  "keywords": ["three", "360", "image-perview", "threejs", "tpno", "web component"],
   "type": "module",
   "scripts": {
     "dev": "vite",
