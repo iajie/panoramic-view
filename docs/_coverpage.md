@@ -5,4 +5,4 @@
 
 [gitee](https://gitee.com/iajie/panoramic-view)
 [github](https://github.com/iajie/panoramic-view)
-[开始了解](./deploy.md)
+[开始了解](deploy.md)

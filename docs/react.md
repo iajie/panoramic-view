@@ -1,4 +1,6 @@
-```tsx
+# React集成
+
+```javascript
 import React, { useEffect, useRef } from 'react';
 import { PanoramicView } from 'panoramic-view';
 import "panoramic-view/dist/style.css";
