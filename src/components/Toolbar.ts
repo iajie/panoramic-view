@@ -21,16 +21,16 @@ const defaultToolbarKeys = [
     "switch",
 ];
 
-defineCustomElement("t-pano-toolbar-show-list", ShowList);
-defineCustomElement("t-pano-toolbar-zoom-in", ZoomIn);
-defineCustomElement("t-pano-toolbar-zoom-out", ZoomOut);
-defineCustomElement("t-pano-toolbar-reset", Reset);
-defineCustomElement("t-pano-toolbar-auto-view", AutoView);
-defineCustomElement("t-pano-toolbar-switch", Switch);
-defineCustomElement("t-pano-toolbar-up", Upward);
-defineCustomElement("t-pano-toolbar-down", Downward);
-defineCustomElement("t-pano-toolbar-left", Leftward);
-defineCustomElement("t-pano-toolbar-right", Rightward);
+defineCustomElement("t-panoramic-toolbar-show-list", ShowList);
+defineCustomElement("t-panoramic-toolbar-zoom-in", ZoomIn);
+defineCustomElement("t-panoramic-toolbar-zoom-out", ZoomOut);
+defineCustomElement("t-panoramic-toolbar-reset", Reset);
+defineCustomElement("t-panoramic-toolbar-auto-view", AutoView);
+defineCustomElement("t-panoramic-toolbar-switch", Switch);
+defineCustomElement("t-panoramic-toolbar-up", Upward);
+defineCustomElement("t-panoramic-toolbar-down", Downward);
+defineCustomElement("t-panoramic-toolbar-left", Leftward);
+defineCustomElement("t-panoramic-toolbar-right", Rightward);
 
 export class Toolbar extends HTMLElement {
 
@@ -43,7 +43,7 @@ export class Toolbar extends HTMLElement {
         if (this.children && this.children.length) {
             return;
         }
-        this.classList.add("t-pano-toolbar");
+        this.classList.add("t-panoramic-toolbar");
         for (let button of this.toolbar) {
             this.appendChild(button);
         }
@@ -68,24 +68,24 @@ export class Toolbar extends HTMLElement {
             try {
                 if (typeof toolbarKey === "string") {
                     toolbarKey = toolbarKey.trim();
-                    const button = document.createElement(`t-pano-toolbar-${toolbarKey}`) as AbstractToolbar;
+                    const button = document.createElement(`t-panoramic-toolbar-${toolbarKey}`) as AbstractToolbar;
                     button.style.display = toolbarKey === "switch" ? "block" : "none";
-                    button.classList.add("t-pano-toolbar-item");
+                    button.classList.add("t-panoramic-toolbar-item");
                     button.onCreate(panoramic);
                     const tip = t(toolbarKey) as string;
                     button.setAttribute("data-title", tip);
                     tip && tippy(button, {
-                        appendTo: document.querySelector('.t-pano-container')!,
+                        appendTo: document.querySelector('.t-panoramic-container')!,
                         content: tip,
-                        theme: "t-pano-tip",
+                        theme: "t-panoramic-tip",
                         arrow: true,
                         placement: "left"
                     });
                     this.toolbar.push(button);
                 } else {
                     const custom = toolbarKey as Custom;
-                    const button = document.createElement("t-pano-toolbar-custom") as CustomDom;
-                    button.classList.add("t-pano-toolbar-item");
+                    const button = document.createElement("t-panoramic-toolbar-custom") as CustomDom;
+                    button.classList.add("t-panoramic-toolbar-item");
                     if (custom.id) {
                         button.setAttribute("id", custom.id);
                     }
@@ -97,9 +97,9 @@ export class Toolbar extends HTMLElement {
                     if (custom.tip) {
                         const tip = t(custom.tip) as string;
                         tip && tippy(button, {
-                            appendTo: document.querySelector('.t-pano-container')!,
+                            appendTo: document.querySelector('.t-panoramic-container')!,
                             content: tip,
-                            theme: 't-pano-tip',
+                            theme: 't-panoramic-tip',
                             arrow: true,
                             placement: "left"
                         });

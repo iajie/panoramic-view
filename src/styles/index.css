@@ -1,4 +1,4 @@
-.t-pano-container {
+.t-panoramic-container {
     position: relative;
     overflow: hidden;
     width: 100%;
@@ -94,29 +94,29 @@
         z-index: 1;
     }
 
-    .tippy-box[data-theme~='t-pano-tip'] {
+    .tippy-box[data-theme~='t-panoramic-tip'] {
         background-color: #333;
         color: #eee;
     }
 
-    .tippy-box[data-theme~='t-pano-tip'][data-placement^='top'] > .tippy-arrow::before {
+    .tippy-box[data-theme~='t-panoramic-tip'][data-placement^='top'] > .tippy-arrow::before {
         border-top-color: #333;
     }
 
-    .tippy-box[data-theme~='t-pano-tip'][data-placement^='bottom'] > .tippy-arrow::before {
+    .tippy-box[data-theme~='t-panoramic-tip'][data-placement^='bottom'] > .tippy-arrow::before {
         border-bottom-color: #333;
     }
 
-    .tippy-box[data-theme~='t-pano-tip'][data-placement^='left'] > .tippy-arrow::before {
+    .tippy-box[data-theme~='t-panoramic-tip'][data-placement^='left'] > .tippy-arrow::before {
         border-left-color: #333;
     }
 
-    .tippy-box[data-theme~='t-pano-tip'][data-placement^='right'] > .tippy-arrow::before {
+    .tippy-box[data-theme~='t-panoramic-tip'][data-placement^='right'] > .tippy-arrow::before {
         border-right-color: #333;
     }
 }
 
-.t-pano-file-list {
+.t-panoramic-file-list {
     position: absolute;
     width: 100%;
     padding: 8px 0;
@@ -156,20 +156,20 @@
         background-color: #404040;
     }
 
-    .t-pano-file-list-box {
+    .t-panoramic-file-list-box {
         margin: 0 16px;
         position: relative;
     }
 
-    .t-pano-file-list-box:nth-last-child(1) {
+    .t-panoramic-file-list-box:nth-last-child(1) {
         padding-right: 18px;
     }
-    .t-pano-file-list-box-img {
+    .t-panoramic-file-list-box-img {
         width: 180px;
         height: 100px;
         background-color: #ffffffcc;
     }
-    .t-pano-file-list-box-p {
+    .t-panoramic-file-list-box-p {
         position: absolute;
         left: 0;
         bottom: 0;
@@ -179,17 +179,17 @@
     }
 
     @media (max-width: 700px) {
-        .t-pano-file-list-box-img {
+        .t-panoramic-file-list-box-img {
             width: 120px;
             height: 70px;
             background-color: #ffffffcc;
         }
-        .t-pano-file-list-box-img {
+        .t-panoramic-file-list-box-img {
             width: 120px;
             height: 70px;
             background-color: #ffffffcc;
         }
-        .t-pano-file-list-box-p {
+        .t-panoramic-file-list-box-p {
             position: absolute;
             left: 0;
             bottom: 0;

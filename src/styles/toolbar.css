@@ -1,4 +1,4 @@
-.t-pano-toolbar {
+.t-panoramic-toolbar {
     position: absolute;
     bottom: 188px;
     right: 35px;
@@ -10,9 +10,34 @@
     overflow: hidden;
     width: 42px;
     max-height: 500px;
+
+    &.two-column {
+        max-height: 250px;
+        width: 86px;
+        flex-wrap: wrap;
+        border-radius: 5px;
+        overflow: auto;
+        &::-webkit-scrollbar {
+            width: 4px;
+            height: 6px;
+        }
+        &::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            background-color: #dddddd70;
+        }
+        &::-webkit-scrollbar-thumb:hover {
+            border-radius: 10px;
+            background-color: #404040;
+        }
+        &::-webkit-scrollbar-thumb:active {
+            border-radius: 10px;
+            background-color: #404040;
+        }
+    }
+
 }
 
-.t-pano-toolbar-item {
+.t-panoramic-toolbar-item {
     background-color: #ffffff;
     border-radius: 50px;
     box-sizing: border-box;
@@ -27,7 +52,7 @@
     }
 }
 
-.t-pano-toolbar-item-s {
+.t-panoramic-toolbar-item-s {
     position: absolute;
     bottom: 2px;
 }

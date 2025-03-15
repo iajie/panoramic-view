@@ -11,9 +11,9 @@ import { Loading } from "../components/Loading.ts";
 import { JelleAnimator } from "../utils/Animation.ts";
 import { FileListBox } from "../components/FileListBox.ts";
 
-defineCustomElement('t-pano-toolbar', Toolbar);
-defineCustomElement('t-pano-loading', Loading);
-defineCustomElement('t-pano-file-box', FileListBox);
+defineCustomElement('t-panoramic-toolbar', Toolbar);
+defineCustomElement('t-panoramic-loading', Loading);
+defineCustomElement('t-panoramic-file-box', FileListBox);
 
 export interface FileList {
     name: string;
@@ -138,7 +138,7 @@ export class PanoramicView {
 
     options: PanoramicViewOptions;
     /**
-     * t-pano全景dom
+     * t-panoramic全景dom
      */
     container!: HTMLDivElement;
     loadTextureLoaderIndex: number = 0;
@@ -152,7 +152,7 @@ export class PanoramicView {
      * @description 镜头角度
      */
     anglexoz: number = -90;
-    rotateAnimateTimer: number | null = null;
+    rotateAnimateTimer: any = null;
     /**
      * @description 手机端多点触控 用来开闭鼠标控制支持的，如果用户在进行放大手势，应该将鼠标视角控制锁定
      */
@@ -187,7 +187,7 @@ export class PanoramicView {
             }
         }
         i18next.init({ lng: this.options.lang, resources }).then(() => {
-            this.initPano();
+            this.initPanoramic();
         });
     }
 
@@ -195,7 +195,7 @@ export class PanoramicView {
      * 初始化组件
      * @private
      */
-    private initPano() {
+    private initPanoramic() {
         if (!this.options.fileList || !this.options.fileList.length) {
             throw new Error(t("noFindFile"));
         }
@@ -203,18 +203,18 @@ export class PanoramicView {
         const rootEl = typeof this.options.container === "string" ?
             document.querySelector(this.options.container) as Element : this.options.container;
         // 获取父级dom class
-        this.container = rootEl.querySelector(".t-pano-container")!;
+        this.container = rootEl.querySelector(".t-panoramic-container")!;
         // 如果没有就创建
         if (!this.container) {
             this.container = document.createElement("div");
-            this.container.classList.add("t-pano-container");
+            this.container.classList.add("t-panoramic-container");
         }
         rootEl.appendChild(this.container);
 
         // 工具栏
         this.toolbar = new Toolbar();
         this.toolbar.onCreate(this);
-        rootEl.appendChild(this.toolbar);
+        this.container.appendChild(this.toolbar);
 
         // 加载动画
         this.loading = new Loading();
@@ -310,15 +310,15 @@ export class PanoramicView {
 
     private loadAnimate() {
         show(this.loading);
-        JelleAnimator.create(".t-pano-loading-bar-x").stop();
-        JelleAnimator.create(".t-pano-loading-bar-x").animate({
+        JelleAnimator.create(".t-panoramic-loading-bar-x").stop();
+        JelleAnimator.create(".t-panoramic-loading-bar-x").animate({
             width: "100%"
         }, 1000);
     }
 
     private closeLoadAnimate() {
         setTimeout(() => {
-            JelleAnimator.create(".t-pano-loading-bar-x").animate({
+            JelleAnimator.create(".t-panoramic-loading-bar-x").animate({
                 width: "0%"
             }, 0, () => {
                 hide(this.loading);
@@ -532,7 +532,8 @@ export class PanoramicView {
             const target = event.target as HTMLElement;
             // 如果是文件列表就不缩放了
             for (let className of target.classList) {
-                if (className.startsWith("t-pano-file-list")) {
+                if (className.startsWith("t-panoramic-file-list") ||
+                    className.startsWith("t-panoramic-toolbar") || target.parentElement?.className.startsWith("t-panoramic-toolbar")) {
                     return;
                 }
             }
@@ -570,7 +571,7 @@ export class PanoramicView {
         const photo = this.options.fileList[index];
         // 如果是视频
         if (photo.type == 'video') {
-            const id = `t-pano-video-${index}`;
+            const id = `t-panoramic-video-${index}`;
             this.container.insertAdjacentHTML('beforeend',`
                 <video id="${id}" loop muted style="display: none;" crossOrigin="anonymous" playsinline >
                     <source src="${photo.url}">
@@ -677,7 +678,7 @@ export class PanoramicView {
         }
         // 切换时再播放视频
         if (photo.type === "video") {
-            const videoDom = document.getElementById(`t-pano-video-${index}`)! as HTMLVideoElement;
+            const videoDom = document.getElementById(`t-panoramic-video-${index}`)! as HTMLVideoElement;
             videoDom.play();
         }
         this.mesh.material = new THREE.MeshBasicMaterial({ map: this.texture[index] });
@@ -743,7 +744,36 @@ export class PanoramicView {
     }
 
     destroy() {
-        this.container.remove();
+        if (this.container) {
+            this.container.removeEventListener("pointerdown", () => {
+                if (this.options.debug) {
+                    console.debug("当指针开始接触屏幕时触发.");
+                }
+            });
+            this.container.removeEventListener("pointerup", () => {
+                if (this.options.debug) {
+                    console.debug("当指针离开屏幕时触发.");
+                }
+            });
+            this.container.removeEventListener("pointermove", () => {
+                if (this.options.debug) {
+                    console.debug("当指针在屏幕上移动时触发.");
+                }
+            });
+            this.container.removeEventListener("wheel", () => {
+                if (this.options.debug) {
+                    console.debug("滚轮监听事件销毁.");
+                }
+            });
+            this.container.remove();
+        }
+        document.removeEventListener("keydown", () => {
+            if (this.options.debug) {
+                console.debug("按键事件监听销毁.");
+            }
+        });
+        this.toolbar?.remove();
+        this.fileListBox?.remove();
     }
 
     /**

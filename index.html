@@ -4,20 +4,10 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/webstorm-icon-logo.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>t-pano-js</title>
-  <script>
-    function changeLanguage() {
-      const options = pv.getOptions();
-      if (options.lang == 'en') {
-        pv.changeLocal("zh");
-      } else {
-        pv.changeLocal("en");
-      }
-    }
-  </script>
+  <title>panoramic-view</title>
 </head>
 <body>
 <div id="t-pano" style="width: 100%; height: 98vh"></div>
-<script type="module" src="/src/main.ts"></script>
+<script type="module" src="./src/main.ts"></script>
 </body>
 </html>

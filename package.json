@@ -1,31 +1,61 @@
 {
-  "name": "panoramic-view",
-  "description": "基于ThreeJS构建的全景图查看器。",
-  "version": "0.0.1",
-  "author": {
-    "email": "ajie20999@163.com",
-    "name": "MoJie",
-    "url": "https://gitee.com/iajie"
-  },
-  "repository": {
-    "url": "https://gitee.com/iajie/panoramic-view"
-  },
-  "keywords": ["three", "360", "image-perview", "threejs", "tpno", "web component"],
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
-  },
-  "devDependencies": {
-    "@types/three": "^0.174.0",
-    "prettier": "^3.3.1",
-    "typescript": "^5.2.2",
-    "vite": "^5.2.0"
-  },
-  "dependencies": {
-    "i18next": "^24.2.2",
-    "three": "^0.174.0",
-    "tippy.js": "^6.3.7"
-  }
+    "name": "panoramic-view",
+    "description": "基于ThreeJS构建的全景图查看器。",
+    "version": "0.0.6",
+    "type": "module",
+    "module": "./dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist",
+        "LICENSE",
+        "README.md"
+    ],
+    "exports": {
+        ".": {
+            "require": "./dist/index.cjs",
+            "import": "./dist/index.js",
+            "types": "./dist/index.d.ts"
+        },
+        "./dist/style.css": {
+            "import": "./dist/style.css",
+            "require": "./dist/style.css"
+        }
+    },
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc && vite build",
+        "preview": "vite preview"
+    },
+    "devDependencies": {
+        "@types/three": "^0.174.0",
+        "prettier": "^3.3.1",
+        "typescript": "^5.2.2",
+        "vite": "^5.2.0",
+        "vite-plugin-dts": "^4.5.3"
+    },
+    "dependencies": {
+        "i18next": "^24.2.2",
+        "three": "^0.174.0",
+        "tippy.js": "^6.3.7"
+    },
+    "author": {
+        "email": "ajie20999@163.com",
+        "name": "MoJie",
+        "url": "https://gitee.com/iajie"
+    },
+    "repository": {
+        "url": "https://gitee.com/iajie/panoramic-view"
+    },
+    "publishConfig": {
+        "access": "public",
+        "registry": "https://registry.npmjs.org/"
+    },
+    "keywords": [
+        "three",
+        "360",
+        "image-perview",
+        "threejs",
+        "tpno",
+        "web component"
+    ]
 }
