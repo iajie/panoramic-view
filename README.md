@@ -33,7 +33,7 @@ const Panoramic: React.FC = ({}) => {
     //定义 ref
     const divRef = useRef(null);
 
-    //初始化 AiEditor
+    //初始化 PanoramicView
     useEffect(() => {
         if (divRef.current) {
             const panoramicView = new PanoramicView({

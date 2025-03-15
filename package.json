@@ -1,26 +1,13 @@
 {
     "name": "panoramic-view",
     "description": "基于ThreeJS构建的全景图查看器。",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "type": "module",
-    "module": "./dist/index.js",
-    "types": "dist/index.d.ts",
     "files": [
         "dist",
         "LICENSE",
         "README.md"
     ],
-    "exports": {
-        ".": {
-            "require": "./dist/index.cjs",
-            "import": "./dist/index.js",
-            "types": "./dist/index.d.ts"
-        },
-        "./dist/style.css": {
-            "import": "./dist/style.css",
-            "require": "./dist/style.css"
-        }
-    },
     "scripts": {
         "dev": "vite",
         "build": "tsc && vite build",
