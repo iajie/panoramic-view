@@ -105,10 +105,6 @@ export interface PanoramicViewOptions {
      */
     toolbarExcludeKeys?: string[];
     /**
-     * 加载效果-全局的
-     */
-    loading?: boolean;
-    /**
      * 加载中事件
      */
     onLoad?: (e: LoadTexture) => void;
@@ -131,7 +127,6 @@ const defaultOptions: Partial<PanoramicViewOptions> = {
     deviceOrientationControls: false,
     rotateAnimateController: true,
     debug: false,
-    loading: false,
 };
 
 export class PanoramicView {
@@ -361,7 +356,7 @@ export class PanoramicView {
         this.render();
     }
 
-    phoneController() {
+    private phoneController() {
         let oldL = 0, x1, x2, y1, y2, l;
         document.addEventListener('touchstart', (event)=> {
             if (!this.options.mouseController) {
@@ -401,7 +396,7 @@ export class PanoramicView {
         }, false);
     }
 
-    wardKeydown() {
+    private wardKeydown() {
         document.addEventListener("keydown", (event)=> {
             switch (event.code) {
                 case "ArrowUp":
@@ -420,7 +415,7 @@ export class PanoramicView {
         });
     }
 
-    mouseController() {
+    private mouseController() {
         //初始化鼠标控制用变量
         let isUserInteracting = false, onPointerDownMouseX = 0, onPointerDownMouseY = 0,
             lon = -90, onPointerDownLon = 0, lat = 0, onPointerDownLat = 0,
@@ -567,7 +562,7 @@ export class PanoramicView {
         this.renderer.render(this.scene, this.camera);
     }
 
-    loadTextureLoader(index: number) {
+    private loadTextureLoader(index: number) {
         const photo = this.options.fileList[index];
         // 如果是视频
         if (photo.type == 'video') {
@@ -592,7 +587,7 @@ export class PanoramicView {
         }
     }
 
-    loadTextureLoaderEnd() {
+    private loadTextureLoaderEnd() {
         let i = this.loadTextureLoaderIndex;
         const photo = this.options.fileList[i];
         const fileLength = this.options.fileList.length;
@@ -653,7 +648,7 @@ export class PanoramicView {
         return response;
     }
 
-    switchGo(index: number) {
+    private switchGo(index: number) {
         const fileList = this.options.fileList;
         const photo = fileList[index];
         let fov = null;
