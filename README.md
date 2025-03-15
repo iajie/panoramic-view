@@ -1,6 +1,15 @@
 
-<h1 align="center"><a href="https://www.easy-flowable.online/component" target="_blank">panoramic-view</a></h1>
-<h4 align="center"><a href='https://gitee.com/iajie/panoramic-view/stargazers'><img src='https://gitee.com/iajie/panoramic-view/badge/star.svg?theme=gvp' alt='star' /></a></h4>
+<h1 align="center">
+    <a href="https://www.easy-flowable.online/component" target="_blank">panoramic-view</a>
+</h1>
+<h4 align="center">
+    <a href='https://gitee.com/iajie/panoramic-view/stargazers'>
+        <img src='https://gitee.com/iajie/panoramic-view/badge/star.svg?theme=gvp' alt='star' />
+    </a>
+    <a href='https://github.com/iajie/panoramic-view/stargazers'>
+        <img src='https://img.shields.io/github/stars/iajie/panoramic-view.svg?logo=github' alt='star' />
+    </a>
+</h4>
 
 <h2 align="center">简易 开源全景图片查看器</h2>
 <h3 align="center">开箱即用、支持所有前端框架</h4>
