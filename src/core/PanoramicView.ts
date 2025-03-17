@@ -156,7 +156,7 @@ export class PanoramicView {
     /**
      * 调试
      */
-    debug: boolean = true;
+    debug: boolean = false;
 
     toolbar!: Toolbar;
     loading!: Loading;
@@ -262,7 +262,7 @@ export class PanoramicView {
         this.autoAnimate();
 
         // debug提示框
-        this.debugTip();
+        this.debugTip(rootEl);
         // 点击后停止自转
         this.container.addEventListener('pointerdown', ()=> {
             if (this.options.mouseController) {
@@ -421,14 +421,14 @@ export class PanoramicView {
         });
     }
 
-    private debugTip() {
+    private debugTip(rootEl: Element) {
         this.tipInstance = tippy(this.renderer.domElement, {
-            appendTo: document.body,
-            theme: "t-panoramic-tip",
+            appendTo: rootEl,
+            placement: "top-start",
             interactive: true,
             trigger: 'manual',
             hideOnClick: 'toggle',
-            arrow: false,
+            arrow: true,
         });
     }
 
@@ -464,6 +464,10 @@ export class PanoramicView {
             if (!this.options.mouseController) {
                 return;
             }
+            if ((event.target as HTMLElement).tagName.toLowerCase() !== 'canvas') {
+                this.tipInstance.hide();
+                return;
+            }
             const distance = Math.sqrt(Math.pow(Math.abs(event.clientX - clientX), 2) +
                 Math.pow(Math.abs(event.clientY - clientY), 2));//鼠标按下到松开期间移动距离
             if (distance <= 10) {
@@ -481,13 +485,34 @@ export class PanoramicView {
             for (let i = 0; i < intersects.length; i++) {
                 if (this.debug) {
                     const point = intersects[i].point;
+                    const content = document.createElement("div");
+                    content.classList.add("help-dialog-content");
+                    content.innerHTML = `<h4>调试参数</h4>
+                      <div class="help-section">
+                        <h5>参数位置：</h5>
+                        <ul>
+                          <li>x: ${point.x}</li>
+                          <li>y: ${point.y}</li>
+                          <li>z: ${point.z}</li>
+                        </ul>
+                    </div>`;
+                    const copy = document.createElement("button");
+                    copy.innerText = "复制obj";
+                    copy.addEventListener("click", ()=> {
+                        navigator.clipboard.writeText(`position: { x: ${point.x}, y: ${point.y}, z: ${point.z} }`).then(() => {
+                            copy.innerText = "复制成功";
+                            setTimeout(() => copy.innerText = "复制obj", 500);
+                        });
+                    });
+                    content.appendChild(copy);
+                    const close = document.createElement("button");
+                    close.innerText = "关闭";
+                    close.addEventListener("click", () => this.tipInstance.hide());
+                    content.appendChild(close);
                     this.tipInstance.setProps({
                         ...this.tipInstance.props,
-                        offset: ({ reference }) => {
-                            console.log(clientX - reference.width, clientY - reference.height)
-                            return [clientX*2 - reference.width, clientY*2 - reference.height]
-                        },
-                        content: `x: ${point.x}, y: ${point.y}, z: ${point.z}`,
+                        offset: [clientX, -clientY],
+                        content: content,
                     });
                     this.tipInstance.show();
                     console.log('提示：', mouse);

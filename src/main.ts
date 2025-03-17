@@ -39,6 +39,5 @@ window.pv = new PanoramicView({
             ]
         }
     ],
-    debug: true,
     rotateAnimateController: false
 });
