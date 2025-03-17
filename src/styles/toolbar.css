@@ -12,7 +12,7 @@
     max-height: 500px;
 
     &.two-column {
-        max-height: 250px;
+        max-height: 260px;
         width: 86px;
         flex-wrap: wrap;
         border-radius: 5px;
@@ -50,9 +50,14 @@
         width: 100%;
         height: 100%;
     }
-}
 
-.t-panoramic-toolbar-item-s {
-    position: absolute;
-    bottom: 2px;
+    .point {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background-color: #00aeff;
+        border-radius: 50px;
+        right: 0;
+        bottom: -2px;
+    }
 }

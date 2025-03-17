@@ -10,6 +10,7 @@ import { defineCustomElement, hide, show } from "../utils/DomUtils.ts";
 import { Loading } from "../components/Loading.ts";
 import { JelleAnimator } from "../utils/Animation.ts";
 import { FileListBox } from "../components/FileListBox.ts";
+import tippy, { Instance } from "tippy.js";
 
 defineCustomElement('t-panoramic-toolbar', Toolbar);
 defineCustomElement('t-panoramic-loading', Loading);
@@ -117,8 +118,6 @@ export interface PanoramicViewOptions {
      * 图片切换事件
      */
     switchLoad?: (e: SwitchTexture) => void;
-
-    debug?: boolean;
 }
 
 const defaultOptions: Partial<PanoramicViewOptions> = {
@@ -126,7 +125,6 @@ const defaultOptions: Partial<PanoramicViewOptions> = {
     mouseController: true,
     deviceOrientationControls: false,
     rotateAnimateController: true,
-    debug: false,
 };
 
 export class PanoramicView {
@@ -155,9 +153,15 @@ export class PanoramicView {
     rotateAnimateController?: boolean;
     hotspotAnimate = 0;
 
+    /**
+     * 调试
+     */
+    debug: boolean = true;
+
     toolbar!: Toolbar;
     loading!: Loading;
     fileListBox!: FileListBox;
+    tipInstance!: Instance;
     constructor(options: PanoramicViewOptions) {
         this.options = { ...defaultOptions, ...options };
         this.rotateAnimateController = options.rotateAnimateController;
@@ -257,6 +261,8 @@ export class PanoramicView {
         // 自转动画
         this.autoAnimate();
 
+        // debug提示框
+        this.debugTip();
         // 点击后停止自转
         this.container.addEventListener('pointerdown', ()=> {
             if (this.options.mouseController) {
@@ -415,6 +421,17 @@ export class PanoramicView {
         });
     }
 
+    private debugTip() {
+        this.tipInstance = tippy(this.renderer.domElement, {
+            appendTo: document.body,
+            theme: "t-panoramic-tip",
+            interactive: true,
+            trigger: 'manual',
+            hideOnClick: 'toggle',
+            arrow: false,
+        });
+    }
+
     private mouseController() {
         //初始化鼠标控制用变量
         let isUserInteracting = false, onPointerDownMouseX = 0, onPointerDownMouseY = 0,
@@ -462,10 +479,20 @@ export class PanoramicView {
             // 计算物体和射线的交点
             const intersects = raycaster.intersectObjects(this.scene.children);
             for (let i = 0; i < intersects.length; i++) {
-                if (this.options.debug == true) {
+                if (this.debug) {
+                    const point = intersects[i].point;
+                    this.tipInstance.setProps({
+                        ...this.tipInstance.props,
+                        offset: ({ reference }) => {
+                            console.log(clientX - reference.width, clientY - reference.height)
+                            return [clientX*2 - reference.width, clientY*2 - reference.height]
+                        },
+                        content: `x: ${point.x}, y: ${point.y}, z: ${point.z}`,
+                    });
+                    this.tipInstance.show();
+                    console.log('提示：', mouse);
                     console.log('点击坐标：', intersects[i].point);
                 }
-                console.log(intersects[i])
                 const jumpTo = intersects[i].object.userData.jumpTo;
                 //检测点击热点是否存在跳转热点
                 if (jumpTo && i == 0) {
@@ -741,29 +768,29 @@ export class PanoramicView {
     destroy() {
         if (this.container) {
             this.container.removeEventListener("pointerdown", () => {
-                if (this.options.debug) {
+                if (this.debug) {
                     console.debug("当指针开始接触屏幕时触发.");
                 }
             });
             this.container.removeEventListener("pointerup", () => {
-                if (this.options.debug) {
+                if (this.debug) {
                     console.debug("当指针离开屏幕时触发.");
                 }
             });
             this.container.removeEventListener("pointermove", () => {
-                if (this.options.debug) {
+                if (this.debug) {
                     console.debug("当指针在屏幕上移动时触发.");
                 }
             });
             this.container.removeEventListener("wheel", () => {
-                if (this.options.debug) {
+                if (this.debug) {
                     console.debug("滚轮监听事件销毁.");
                 }
             });
             this.container.remove();
         }
         document.removeEventListener("keydown", () => {
-            if (this.options.debug) {
+            if (this.debug) {
                 console.debug("按键事件监听销毁.");
             }
         });

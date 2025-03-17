@@ -14,11 +14,12 @@ import { Upward } from "./toolbar/Upward.ts";
 import { Downward } from "./toolbar/Downward.ts";
 import { Leftward } from "./toolbar/Leftward.ts";
 import { Rightward } from "./toolbar/Rightward.ts";
+import { Debug } from "./toolbar/Debug.ts";
 
 const defaultToolbarKeys = [
     "zoom-in", "zoom-out", "reset", "auto-view",
     "up", "down", "left", "right", "show-list",
-    "switch",
+    "debug", "switch",
 ];
 
 defineCustomElement("t-panoramic-toolbar-show-list", ShowList);
@@ -31,6 +32,7 @@ defineCustomElement("t-panoramic-toolbar-up", Upward);
 defineCustomElement("t-panoramic-toolbar-down", Downward);
 defineCustomElement("t-panoramic-toolbar-left", Leftward);
 defineCustomElement("t-panoramic-toolbar-right", Rightward);
+defineCustomElement("t-panoramic-toolbar-debug", Debug);
 
 export class Toolbar extends HTMLElement {
 

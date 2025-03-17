@@ -10,5 +10,6 @@ export const zh = {
     "down": "视角向下旋转",
     "left": "视角向左旋转",
     "right": "视角向由旋转",
+    "debug": "打印坐标点，鼠标点击得到所在位置坐标(xyz)点位，便于设置漫游点位。",
     "noFindFile": "请配置fileList属性。",
 } as any;

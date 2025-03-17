@@ -10,5 +10,6 @@ export const en = {
     "down": "Rotate the perspective downwards",
     "left": "Rotate the perspective leftwards",
     "right": "Rotate the perspective rightwards",
+    "debug": "Debug print log and obtain coordinates",
     "noFindFile": "No FindFile(The fileList property is a required field).",
 }

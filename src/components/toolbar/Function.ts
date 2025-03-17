@@ -32,7 +32,7 @@ export class Switch extends AbstractToolbar {
 
     toolbar(add: boolean = true) {
         const height = this.panoramic.container.clientHeight;
-        if (height <= 600) {
+        if (height <= 700) {
             if (add) {
                 this.panoramic.toolbar.classList.add("two-column");
             } else {
