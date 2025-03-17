@@ -1,6 +1,6 @@
 
 <h1 align="center">
-    <a href="https://www.easy-flowable.online/component" target="_blank">panoramic-view</a>
+    <a href="https://iajie.github.io/panoramic-view/#/" target="_blank">panoramic-view</a>
 </h1>
 <h4 align="center">
     <a href='https://gitee.com/iajie/panoramic-view/stargazers'>
