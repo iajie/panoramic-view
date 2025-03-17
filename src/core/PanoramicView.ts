@@ -49,7 +49,7 @@ export interface Custom {
     icon?: string;
     html?: string;
     tip?: string;
-    onClick?: (event: MouseEvent, camera: THREE.PerspectiveCamera) => void;
+    onClick?: (panoramic: PanoramicView) => void;
 }
 
 interface LoadTexture {
@@ -66,7 +66,7 @@ interface SwitchTexture {
         id: number;
         name?: string;
     },
-    status: 'end' | 'loading';
+    status: 'end' | 'loading' | string;
 }
 
 export interface PanoramicViewOptions {
@@ -515,8 +515,6 @@ export class PanoramicView {
                         content: content,
                     });
                     this.tipInstance.show();
-                    console.log('提示：', mouse);
-                    console.log('点击坐标：', intersects[i].point);
                 }
                 const jumpTo = intersects[i].object.userData.jumpTo;
                 //检测点击热点是否存在跳转热点
@@ -670,6 +668,15 @@ export class PanoramicView {
             msg: '系统出错'
         }
         const fileList = this.options.fileList;
+        if (index >= fileList.length) {
+            this.options.switchLoad?.({
+                loading: {
+                    id: index,
+                    name: fileList[index].name
+                },
+                status: t('switch-end-file')
+            });
+        }
         if (index < this.options.fileList.length && index >= 0) {
             //回调通知：注意全景图片换页事件开始，应该检查全景图片是否下载完毕，主要是用于做进度提示功能
             if (this.loadTextureMsg.all - this.loadTextureMsg.leftOver >= index + 1) {

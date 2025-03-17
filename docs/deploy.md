@@ -1,6 +1,5 @@
 # 快速开始
 
-## npm 方式
 ```bash
 # 通过 npm 获取
 npm install panoramic-view

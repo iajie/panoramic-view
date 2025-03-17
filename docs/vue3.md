@@ -6,7 +6,7 @@
 </template>
 <script setup lang="ts">
 import { PanoramicView } from "panoramic-view";
-import "panoramic-view/dist/style.css";
+import "panoramic-view/style.css";
 import { onMounted, ref, onUnmounted } from 'vue';
 
 const panoramic = ref();

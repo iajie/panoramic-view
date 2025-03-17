@@ -5,7 +5,6 @@
 |         fileList         |     文件列表     |       [FileList](#fileList)        | 必填                              |
 |           lang           | 语言(工具栏提示框文字) |             `zh`丨`en`              | `zh`                            |
 |           i18n           |     国际化      |                                    | `{}`                            |
-|          debug           | 开启可打印点位xyz坐标 |             `boolean`              | `false`                         |
 |       toolbarKeys        |     工具栏      |              `string`              | [Custom](#Custom)               |  |
 |    toolbarExcludeKeys    |  不想用的工具栏可排除  |              `string`              |                                 |
 |        onCreated         |   对象创建完成触发   | `(options: PanoramicView) => void` |                                 |

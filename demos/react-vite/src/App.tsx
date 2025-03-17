@@ -1,17 +1,19 @@
-import {useEffect, useRef} from 'react'
+import React, { useEffect, useRef } from 'react';
 import { PanoramicView } from "panoramic-view";
-import "panoramic-view/dist/style.css";
+import "panoramic-view/style.css";
 
 function App() {
 
     //定义 ref
-    const divRef = useRef(null);
+    const ref = useRef(null);
 
-    //初始化 AiEditor
+    const [panoramic, setPanoramic] = React.useState<PanoramicView>();
+
     useEffect(() => {
-        if (divRef.current) {
-            const panoramicView = new PanoramicView({
-                container: divRef.current,
+        if (!!ref.current) {
+            if (panoramic) return ;
+            const pv = new PanoramicView({
+                container: ref.current,
                 fileList: [
                     {
                         name: "乌蒙大草原入口",
@@ -25,22 +27,21 @@ function App() {
                         name: "乌蒙大草原漫游3",
                         url: "3.jpg",
                     },
-                ]
-            })
+                ],
+            });
+            setPanoramic(pv);
             return () => {
-                panoramicView.destroy();
+                return pv.destroy();
             }
         }
     }, [])
 
-    return (
-        <>
-            <div>
-                <h1>PanoramicView，一个基于three.js 的全景 图片/视频 查看器</h1>
-            </div>
-            <div ref={divRef} style={{height: "600px"}} />
-        </>
-    )
+    return <>
+        <div>
+            <h1>PanoramicView，一个基于three.js 的全景 图片/视频 查看器</h1>
+        </div>
+        <div ref={ref} style={{height: "600px"}} />
+    </>
 }
 
 export default App

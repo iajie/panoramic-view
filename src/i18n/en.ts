@@ -12,4 +12,5 @@ export const en = {
     "right": "Rotate the perspective rightwards",
     "debug": "Debug print log and obtain coordinates",
     "noFindFile": "No FindFile(The fileList property is a required field).",
+    "switch-end-file": "Switch end file.",
 }

@@ -33,6 +33,7 @@ defineCustomElement("t-panoramic-toolbar-down", Downward);
 defineCustomElement("t-panoramic-toolbar-left", Leftward);
 defineCustomElement("t-panoramic-toolbar-right", Rightward);
 defineCustomElement("t-panoramic-toolbar-debug", Debug);
+defineCustomElement("t-panoramic-toolbar-custom", CustomDom);
 
 export class Toolbar extends HTMLElement {
 
@@ -53,7 +54,7 @@ export class Toolbar extends HTMLElement {
 
     onCreate(panoramic: PanoramicView) {
         const { options } = panoramic;
-        let toolbarKeys = panoramic.options.toolbarKeys || defaultToolbarKeys;
+        let toolbarKeys = (panoramic.options.toolbarKeys || []).concat(defaultToolbarKeys);
         toolbarKeys = toolbarKeys.filter((tool) => {
             if (typeof tool === "string") {
                 return !options.toolbarExcludeKeys?.includes(tool);
@@ -87,6 +88,7 @@ export class Toolbar extends HTMLElement {
                 } else {
                     const custom = toolbarKey as Custom;
                     const button = document.createElement("t-panoramic-toolbar-custom") as CustomDom;
+                    button.style.display = "none";
                     button.classList.add("t-panoramic-toolbar-item");
                     if (custom.id) {
                         button.setAttribute("id", custom.id);

@@ -6,7 +6,7 @@
 </template>
 <script>
 import { PanoramicView } from "panoramic-view";
-import "panoramic-view/dist/style.css";
+import "panoramic-view/style.css";
 export default {
     data() {
         return {

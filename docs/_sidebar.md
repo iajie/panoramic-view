@@ -5,3 +5,4 @@
 - 基本使用
   - [属性](props.md)
   - [api](api.md)
+- [工具栏](toolbar.md)

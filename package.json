@@ -1,48 +1,60 @@
 {
-    "name": "panoramic-view",
-    "description": "基于ThreeJS构建的全景图查看器。",
-    "version": "0.0.7",
-    "type": "module",
-    "files": [
-        "dist",
-        "LICENSE",
-        "README.md"
-    ],
-    "scripts": {
-        "dev": "vite",
-        "build": "tsc && vite build",
-        "preview": "vite preview"
+  "name": "panoramic-view",
+  "description": "基于ThreeJS构建的全景图查看器。",
+  "version": "1.1.1",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
-    "devDependencies": {
-        "@types/three": "^0.174.0",
-        "prettier": "^3.3.1",
-        "typescript": "^5.2.2",
-        "vite": "^5.2.0",
-        "vite-plugin-dts": "^4.5.3"
-    },
-    "dependencies": {
-        "i18next": "^24.2.2",
-        "three": "^0.174.0",
-        "tippy.js": "^6.3.7"
-    },
-    "author": {
-        "email": "ajie20999@163.com",
-        "name": "MoJie",
-        "url": "https://gitee.com/iajie"
-    },
-    "repository": {
-        "url": "https://gitee.com/iajie/panoramic-view"
-    },
-    "publishConfig": {
-        "access": "public",
-        "registry": "https://registry.npmjs.org/"
-    },
-    "keywords": [
-        "three",
-        "360",
-        "image-perview",
-        "threejs",
-        "tpno",
-        "web component"
-    ]
+    "./style.css": "./dist/style.css"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@types/three": "^0.174.0",
+    "prettier": "^3.3.1",
+    "typescript": "^5.2.2",
+    "@types/node": "^20.9.0",
+    "vite": "^5.2.0",
+    "vite-plugin-dts": "^4.5.3"
+  },
+  "dependencies": {
+    "i18next": "^24.2.2",
+    "three": "^0.174.0",
+    "tippy.js": "^6.3.7"
+  },
+  "author": {
+    "email": "ajie20999@163.com",
+    "name": "MoJie",
+    "url": "https://gitee.com/iajie"
+  },
+  "repository": {
+    "url": "https://gitee.com/iajie/panoramic-view"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "keywords": [
+    "three",
+    "360",
+    "image-perview",
+    "threejs",
+    "tpno",
+    "web component"
+  ]
 }

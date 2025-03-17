@@ -37,7 +37,7 @@ panoramic-view 基于 Web Component 开发，支持与任意主流的前端框�
 ```tsx
 import React, { useEffect, useRef } from 'react';
 import { PanoramicView } from 'panoramic-view';
-
+import "panoramic-view/style.css";
 const Panoramic: React.FC = ({}) => {
 
     //定义 ref
@@ -84,7 +84,7 @@ export default Panoramic;
 </template>
 <script setup lang="ts">
 import { PanoramicView } from "panoramic-view";
-import "panoramic-view/dist/style.css";
+import "panoramic-view/style.css";
 import { onMounted, ref, onUnmounted } from 'vue';
 
 const panoramic = ref();

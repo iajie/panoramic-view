@@ -17,9 +17,9 @@ export class CustomDom extends AbstractToolbar {
             this.template = `<div style="height: 16px">${config.icon}</div>`;
         }
 
-        this.addEventListener("click", (e) => {
+        this.addEventListener("click", () => {
             if (this.panoramic.camera && this.config && this.config.onClick) {
-                this.config.onClick(e, this.panoramic.camera);
+                this.config.onClick(this.panoramic);
             }
         });
     }
