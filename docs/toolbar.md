@@ -1,6 +1,5 @@
 # 工具栏
-?> 工具栏可对PanoramicView提供一些拓展操作。**默认提供的工具栏有**`["zoom-in", "zoom-out", "reset", "auto-view", "up", "down", "left", "right", "show-list", "debug", "switch"]`
-?> 可通过`toolbarExcludeKeys`属性对默认的工具栏进行排除。
+?> 工具栏可对PanoramicView提供一些拓展操作。**默认提供的工具栏有**`["zoom-in", "zoom-out", "reset", "auto-view", "up", "down", "left", "right", "show-list", "debug", "switch"]`可通过`toolbarExcludeKeys`属性对默认的工具栏进行排除。
 
 **[自定义工具栏](#自定义工具栏)**
 
@@ -12,9 +11,6 @@
 
 ## switch
 > 控制工具栏显示和隐藏的按钮。
-
-## show-list
-> 控制文件列表的显影，显示时点击文件可直接跳转到对应的文件。
 
 ## zoom-in
 > 视野放大
@@ -39,5 +35,3 @@
 
 ## right
 > 视角往又旋转，如果禁用了鼠标控制，可以通过改按钮控制。
-
-## 自定义工具栏
